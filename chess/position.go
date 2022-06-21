@@ -46,6 +46,17 @@ func NewPosition() *Position {
 	return &p
 }
 
+// Put puts a piece on the board. No other fields are updated.
 func (p *Position) Put(pc Piece, s Square) {
 	p.Board[pc].Set(s)
+}
+
+// Reset resets the position to the starting position.
+func (p *Position) Reset() {
+	p.Board = [12]Bitboard{}
+	p.Castling = NewCastlingRights()
+	p.EnPassant = NoEnPassant
+	p.SideToMove = White
+	p.HalfMoves = 0
+	p.FullMoves = 0
 }
