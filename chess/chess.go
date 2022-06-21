@@ -48,7 +48,7 @@ func (r Role) String() string {
 type Piece uint8
 
 const (
-	WhitePawn = iota
+	WhitePawn Piece = iota
 	WhiteKnight
 	WhiteBishop
 	WhiteRook
@@ -63,17 +63,17 @@ const (
 )
 
 func NewPiece(c Color, r Role) Piece {
-	return Piece(c*BlackPawn + Color(r))
+	return Piece(uint8(c)*6 + uint8(r))
 }
 
 // Color returns the color of the piece.
 func (p Piece) Color() Color {
-	return Color(p / BlackPawn)
+	return Color(p / 6)
 }
 
 // Role returns the role of the piece.
 func (p Piece) Role() Role {
-	return Role(p % BlackPawn)
+	return Role(p % 6)
 }
 
 // Valid returns true if the piece is valid.
