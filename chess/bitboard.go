@@ -4,12 +4,6 @@ package chess
 // From LSB to MSB, the bits represent a1, b1, ..., h8.
 type Bitboard uint64
 
-const (
-	Bitboard0   Bitboard = 0x0000000000000000
-	Bitboard1   Bitboard = 0x0000000000000001
-	BitboardAll Bitboard = 0xFFFFFFFFFFFFFFFF
-)
-
 // Set sets the given square to 1.
 func (b *Bitboard) Set(s Square) {
 	*b |= s.Bitboard()
