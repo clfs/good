@@ -2,7 +2,7 @@ package chess
 
 // Promotion is a flag that indicates promotion information for a Move.
 //
-// Notably, promotions can be cast to the relevant piece.
+// Notably, promotions can be cast to the corresponding piece.
 // For example, Piece(PromoteToKnight) == Knight.
 type Promotion uint16
 
