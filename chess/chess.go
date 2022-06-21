@@ -1,3 +1,4 @@
+// Package chess provides basic chess constants and functions.
 package chess
 
 // Color represents either white or black.
@@ -16,11 +17,6 @@ func (c Color) Opposite() Color {
 // Valid returns true if the color is valid.
 func (c Color) Valid() bool {
 	return c <= Black
-}
-
-// FEN returns the FEN representation of the color.
-func (c Color) FEN() string {
-	return []string{"w", "b"}[c]
 }
 
 func (c Color) String() string {
@@ -66,6 +62,10 @@ const (
 	BlackKing
 )
 
+func NewPiece(c Color, r Role) Piece {
+	return Piece(c*BlackPawn + Color(r))
+}
+
 // Color returns the color of the piece.
 func (p Piece) Color() Color {
 	return Color(p / BlackPawn)
@@ -79,14 +79,6 @@ func (p Piece) Role() Role {
 // Valid returns true if the piece is valid.
 func (p Piece) Valid() bool {
 	return p <= BlackKing
-}
-
-// FEN returns the FEN representation of the piece.
-func (p Piece) FEN() string {
-	return []string{
-		"p", "n", "b", "r", "q", "k",
-		"P", "N", "B", "R", "Q", "K",
-	}[p]
 }
 
 func (p Piece) String() string {
@@ -209,6 +201,10 @@ const (
 	F8
 	G8
 	H8
+
+	// Special cases. Square.Valid returns false. Not all functions can
+	// meaningfully handle these.
+	NoEnPassant Square = 255
 )
 
 // Valid returns true if the square is valid.
@@ -226,18 +222,9 @@ func (s Square) Rank() Rank {
 	return Rank(s / 8)
 }
 
-// FEN returns the FEN representation of the square.
-func (s Square) FEN() string {
-	return []string{
-		"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
-		"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
-		"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
-		"a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
-		"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
-		"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
-		"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
-		"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
-	}[s]
+// Bitboard returns the bitboard representation of the square.
+func (s Square) Bitboard() Bitboard {
+	return Bitboard(1 << s)
 }
 
 func (s Square) String() string {
@@ -251,4 +238,36 @@ func (s Square) String() string {
 		"A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7",
 		"A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8",
 	}[s]
+}
+
+// CastlingFlag represents a single castling right.
+type CastlingFlag uint8
+
+const (
+	WhiteShortCastle CastlingFlag = 1 << iota
+	WhiteLongCastle
+	BlackShortCastle
+	BlackLongCastle
+)
+
+func (c CastlingFlag) String() string {
+	return []string{"WhiteShortCastle", "WhiteLongCastle", "BlackShortCastle", "BlackLongCastle"}[c]
+}
+
+// CastlingRights represents the castling rights of both players.
+type CastlingRights uint8
+
+// Get returns true if a castling right is available.
+func (c *CastlingRights) Get(f CastlingFlag) bool {
+	return *c&CastlingRights(f) != 0
+}
+
+// Disable disables a castling right.
+func (c *CastlingRights) Disable(f CastlingFlag) {
+	*c &^= CastlingRights(f)
+}
+
+// NewCastlingRights returns a new CastlingRights with all rights enabled.
+func NewCastlingRights() CastlingRights {
+	return CastlingRights(WhiteShortCastle | WhiteLongCastle | BlackShortCastle | BlackLongCastle)
 }
