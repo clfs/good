@@ -39,7 +39,7 @@ var colorFrom = map[string]chess.Color{
 }
 
 var castleRightsFrom = map[string]chess.CastleRights{
-	"":     chess.NoCastleRights,
+	"-":    chess.NoCastleRights,
 	"K":    chess.CastleRights(chess.WhiteShortCastleRight),
 	"Q":    chess.CastleRights(chess.WhiteLongCastleRight),
 	"k":    chess.CastleRights(chess.BlackShortCastleRight),
