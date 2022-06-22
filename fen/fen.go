@@ -12,7 +12,7 @@ func To(p chess.Position) string {
 }
 
 // From returns the position for a FEN string.
-func From(s string) (*chess.Position, error) {
+func From(s string) (chess.Position, error) {
 	p := chess.NewPosition()
 	return p, nil
 }

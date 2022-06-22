@@ -12,7 +12,7 @@ type Position struct {
 }
 
 // NewPosition returns a new position, pre-populated with all starting pieces.
-func NewPosition() *Position {
+func NewPosition() Position {
 	p := Position{
 		Board:      [12]Bitboard{},
 		Castling:   AllCastleRights,
@@ -43,7 +43,7 @@ func NewPosition() *Position {
 	p.Put(BlackBishop, F8)
 	p.Put(BlackKnight, G8)
 	p.Put(BlackRook, H8)
-	return &p
+	return p
 }
 
 // Put puts a piece on the board. No other fields are updated.
