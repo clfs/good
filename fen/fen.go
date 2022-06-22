@@ -82,7 +82,14 @@ func To(p chess.Position) string {
 	return ""
 }
 
-// From returns the position for a FEN string.
+// From returns the position described by the FEN string.
+//
+// These are the only deviations from the PGN standard:
+//
+//   - Adjacent fields must be separated by one or more consecutive white space
+//     characters, as defined by unicode.IsSpace.
+//   - The en passant target square, if any, must be on the third or sixth rank.
+//   - If the full move number is 0, it is treated as if it were 1.
 func From(s string) (chess.Position, error) {
 	var p chess.Position
 
@@ -92,6 +99,7 @@ func From(s string) (chess.Position, error) {
 	}
 
 	// Piece placement.
+	// TODO: check that all 64 squares are specified.
 	square := chess.A8
 	for _, r := range fields[0] {
 		switch r {
@@ -128,7 +136,6 @@ func From(s string) (chess.Position, error) {
 		}
 		square++
 	}
-	// TODO: strictly enforce that the board is well-formed and fully specified.
 
 	// Active color.
 	color, ok := colorFrom[fields[1]]
@@ -162,6 +169,9 @@ func From(s string) (chess.Position, error) {
 	fullMoves, err := strconv.ParseUint(fields[5], 10, 16)
 	if err != nil {
 		return p, fmt.Errorf("fen: invalid full-move count: %s", fields[5])
+	}
+	if fullMoves == 0 { // Fix a common mistake in various FEN strings.
+		fullMoves = 1
 	}
 	p.FullMoves = uint16(fullMoves)
 
