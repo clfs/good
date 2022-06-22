@@ -4,8 +4,8 @@ package chess
 // Three-fold repetition is not tracked here.
 type Position struct {
 	Board      [12]Bitboard
-	Castling   CastlingRights
-	EnPassant  Square
+	Castling   CastleRights
+	EnPassant  EnPassantRight
 	SideToMove Color
 	HalfMoves  uint8
 	FullMoves  uint16
@@ -15,8 +15,8 @@ type Position struct {
 func NewPosition() *Position {
 	p := Position{
 		Board:      [12]Bitboard{},
-		Castling:   NewCastlingRights(),
-		EnPassant:  NoEnPassant,
+		Castling:   AllCastleRights,
+		EnPassant:  NoEnPassantRight,
 		SideToMove: White,
 		HalfMoves:  0,
 		FullMoves:  0,
@@ -54,8 +54,8 @@ func (p *Position) Put(pc Piece, s Square) {
 // Reset resets the position to the starting position.
 func (p *Position) Reset() {
 	p.Board = [12]Bitboard{}
-	p.Castling = NewCastlingRights()
-	p.EnPassant = NoEnPassant
+	p.Castling = AllCastleRights
+	p.EnPassant = NoEnPassantRight
 	p.SideToMove = White
 	p.HalfMoves = 0
 	p.FullMoves = 0

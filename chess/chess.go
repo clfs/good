@@ -201,10 +201,6 @@ const (
 	F8
 	G8
 	H8
-
-	// Special cases. Square.Valid returns false. Not all functions can
-	// meaningfully handle these.
-	NoEnPassant Square = 255
 )
 
 // Valid returns true if the square is valid.
@@ -240,55 +236,34 @@ func (s Square) String() string {
 	}[s]
 }
 
-// CastlingFlag represents a single castling right.
-type CastlingFlag uint8
+// CastleRight represents a single castle right.
+type CastleRight uint8
 
 const (
-	WhiteShortCastle CastlingFlag = 1 << iota
+	WhiteShortCastle CastleRight = 1 << iota
 	WhiteLongCastle
 	BlackShortCastle
 	BlackLongCastle
 )
 
-func (c CastlingFlag) String() string {
+func (c CastleRight) String() string {
 	return []string{"WhiteShortCastle", "WhiteLongCastle", "BlackShortCastle", "BlackLongCastle"}[c]
 }
 
-// CastlingRights represents the castling rights of both players.
-type CastlingRights uint8
+// CastleRights represents the available castle rights of both players.
+type CastleRights uint8
 
-// Get returns true if a castling right is available.
-func (c *CastlingRights) Get(f CastlingFlag) bool {
-	return *c&CastlingRights(f) != 0
+// AllCastleRights represents the state where all castle rights are available to both players.
+const AllCastleRights = CastleRights(WhiteShortCastle | WhiteLongCastle | BlackShortCastle | BlackLongCastle)
+
+// Get returns true if a castle right is available.
+func (c *CastleRights) Get(r CastleRight) bool {
+	return *c&CastleRights(r) != 0
 }
 
-// Disable disables a castling right.
-func (c *CastlingRights) Disable(f CastlingFlag) {
-	*c &^= CastlingRights(f)
-}
-
-// NewCastlingRights returns a new CastlingRights with all rights enabled.
-func NewCastlingRights() CastlingRights {
-	return CastlingRights(WhiteShortCastle | WhiteLongCastle | BlackShortCastle | BlackLongCastle)
-}
-
-// Promotion is a flag that indicates promotion information for a Move.
-//
-// Notably, promotions can be cast to the corresponding piece.
-// For example, Piece(PromoteToKnight) == Knight.
-type Promotion uint16
-
-const (
-	NoPromotion Promotion = iota
-	PromoteToKnight
-	PromoteToBishop
-	PromoteToRook
-	PromoteToQueen
-)
-
-// Valid returns true if the promotion's underlying integer value is valid.
-func (p Promotion) Valid() bool {
-	return p <= PromoteToQueen
+// Disable disables a castle right.
+func (c *CastleRights) Disable(r CastleRight) {
+	*c &^= CastleRights(r)
 }
 
 // Move represents an engine move, or equivalently, a transition between
@@ -297,10 +272,17 @@ type Move uint16
 
 // NewMove returns a new Move.
 //
+// To represent promotion moves, use NewPromotionMove instead.
+//
 // To represent castling moves, use the king and rook's current squares as the
 // from and to squares respectively.
-func NewMove(from, to Square, promotion Promotion) Move {
-	return Move(from) | Move(to)<<6 | Move(promotion)<<12
+func NewMove(from, to Square) Move {
+	return Move(from) | Move(to)<<6
+}
+
+// NewPromotionMove returns a new Move that records the given promotion.
+func NewPromotionMove(from, to Square, p Piece) Move {
+	return Move(from) | Move(to)<<6 | Move(p)<<12
 }
 
 // From returns the square at which the move starts, except when the move is
@@ -321,12 +303,19 @@ func (m Move) To() Square {
 	return Square((m >> 6) & 0x3F)
 }
 
-// Promotion returns promotion information for the move.
-func (m Move) Promotion() Promotion {
-	return Promotion((m >> 12) & 0xF)
+// Promotion returns promotion information for the move. If the move is not
+// a promotion move, ok is false.
+func (m Move) Promotion() (p Piece, ok bool) {
+	p = Piece(m >> 12)
+	return p, p == 0
 }
 
-// IsPromotion returns true if the move is a promotion.
-func (m Move) IsPromotion() bool {
-	return m.Promotion() != NoPromotion
-}
+// EnPassantRight represents an en passant right.
+//
+// A Square can be cast directly to this type, like EnPassantRight(D6).
+//
+// To represent the lack of an en passant right, use NoEnPasssantRight.
+type EnPassantRight uint8
+
+// NoEnPassantRight represents the lack of an en passant right.
+const NoEnPassantRight EnPassantRight = 0xFF
