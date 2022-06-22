@@ -109,32 +109,43 @@ func From(s string) (chess.Position, error) {
 			square -= 16 // move to the leftmost square in the rank below
 		case 'P':
 			p.Put(chess.WhitePawn, square)
+			square++
 		case 'N':
 			p.Put(chess.WhiteKnight, square)
+			square++
 		case 'B':
 			p.Put(chess.WhiteBishop, square)
+			square++
 		case 'R':
 			p.Put(chess.WhiteRook, square)
+			square++
 		case 'Q':
 			p.Put(chess.WhiteQueen, square)
+			square++
 		case 'K':
 			p.Put(chess.WhiteKing, square)
+			square++
 		case 'p':
 			p.Put(chess.BlackPawn, square)
+			square++
 		case 'n':
 			p.Put(chess.BlackKnight, square)
+			square++
 		case 'b':
 			p.Put(chess.BlackBishop, square)
+			square++
 		case 'r':
 			p.Put(chess.BlackRook, square)
+			square++
 		case 'q':
 			p.Put(chess.BlackQueen, square)
+			square++
 		case 'k':
 			p.Put(chess.BlackKing, square)
+			square++
 		default:
 			return p, fmt.Errorf("fen: invalid board rune: %c", r)
 		}
-		square++
 	}
 
 	// Active color.
