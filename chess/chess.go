@@ -240,21 +240,21 @@ func (s Square) String() string {
 type CastleRight uint8
 
 const (
-	WhiteShortCastle CastleRight = 1 << iota
-	WhiteLongCastle
-	BlackShortCastle
-	BlackLongCastle
+	WhiteShortCastleRight CastleRight = 1 << iota
+	WhiteLongCastleRight
+	BlackShortCastleRight
+	BlackLongCastleRight
 )
 
 func (c CastleRight) String() string {
-	return []string{"WhiteShortCastle", "WhiteLongCastle", "BlackShortCastle", "BlackLongCastle"}[c]
+	return []string{"WhiteShortCastleRight", "WhiteLongCastleRight", "BlackShortCastleRight", "BlackLongCastleRight"}[c]
 }
 
 // CastleRights represents the available castle rights of both players.
 type CastleRights uint8
 
 // AllCastleRights represents the state where all castle rights are available to both players.
-const AllCastleRights = CastleRights(WhiteShortCastle | WhiteLongCastle | BlackShortCastle | BlackLongCastle)
+const AllCastleRights CastleRights = 0xF
 
 // Get returns true if a castle right is available.
 func (c *CastleRights) Get(r CastleRight) bool {
