@@ -3,12 +3,12 @@ package chess
 // Position represents a game position.
 // Three-fold repetition is not tracked here.
 type Position struct {
-	Board      [12]Bitboard
+	Board      [12]Bitboard // Board describes which pieces are on the board and where.
 	Castling   CastleRights
 	EnPassant  EnPassantRight
 	SideToMove Color
-	HalfMoves  uint8
-	FullMoves  uint16
+	HalfMoves  uint8  // HalfMoves is the number of half moves since the last capture or pawn move.
+	FullMoves  uint16 // FullMoves is the number of full moves since the start of the game.
 }
 
 // NewPosition returns a new position, pre-populated with all starting pieces.
