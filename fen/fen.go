@@ -89,7 +89,7 @@ func To(p chess.Position) string {
 //   - Adjacent fields must be separated by one or more consecutive white space
 //     characters, as defined by unicode.IsSpace.
 //   - The en passant target square, if any, must be on the third or sixth rank.
-//   - If the full move number is 0, it is treated as if it were 1.
+//   - If the full move number is 0, it is interpreted as if it were 1.
 func From(s string) (chess.Position, error) {
 	var p chess.Position
 
