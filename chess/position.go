@@ -51,6 +51,17 @@ func (p *Position) Put(pc Piece, s Square) {
 	p.Board[pc].Set(s)
 }
 
+// Get returns the piece on the given square.
+// If there's no piece there, ok is false.
+func (p *Position) Get(s Square) (pc Piece, ok bool) {
+	for pc := WhitePawn; pc <= BlackKing; pc++ {
+		if p.Board[pc].Get(s) {
+			return pc, true
+		}
+	}
+	return 0, false
+}
+
 // Reset resets the position to the starting position.
 func (p *Position) Reset() {
 	p.Board = [12]Bitboard{}
