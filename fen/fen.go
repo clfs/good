@@ -13,6 +13,9 @@ import (
 const Starting = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 func init() {
+	colorTo = make(map[chess.Color]string)
+	castleRightsTo = make(map[chess.CastleRights]string)
+	enPassantRightTo = make(map[chess.EnPassantRight]string)
 	for k, v := range colorFrom {
 		colorTo[v] = k
 	}

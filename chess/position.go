@@ -8,7 +8,7 @@ type Position struct {
 	EnPassant  EnPassantRight
 	SideToMove Color
 	HalfMoves  uint8  // HalfMoves is the number of half moves since the last capture or pawn move.
-	FullMoves  uint16 // FullMoves is the number of full moves since the start of the game.
+	FullMoves  uint16 // FullMoves starts at 1 and is incremented after Black moves.
 }
 
 // NewPosition returns a new position, pre-populated with all starting pieces.
@@ -19,7 +19,7 @@ func NewPosition() Position {
 		EnPassant:  NoEnPassantRight,
 		SideToMove: White,
 		HalfMoves:  0,
-		FullMoves:  0,
+		FullMoves:  1,
 	}
 	p.Put(WhiteRook, A1)
 	p.Put(WhiteKnight, B1)
@@ -58,5 +58,5 @@ func (p *Position) Reset() {
 	p.EnPassant = NoEnPassantRight
 	p.SideToMove = White
 	p.HalfMoves = 0
-	p.FullMoves = 0
+	p.FullMoves = 1
 }
