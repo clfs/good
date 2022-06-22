@@ -253,12 +253,21 @@ func (c CastleRight) String() string {
 // CastleRights represents the available castle rights of both players.
 type CastleRights uint8
 
-// AllCastleRights represents the state where all castle rights are available to both players.
-const AllCastleRights CastleRights = 0xF
+const (
+	// NoCastleRights represents the state where no castle rights are available.
+	NoCastleRights CastleRights = 0
+	// AllCastleRights represents the state where all castle rights are available to both players.
+	AllCastleRights CastleRights = 0xF
+)
 
 // Get returns true if a castle right is available.
 func (c *CastleRights) Get(r CastleRight) bool {
 	return *c&CastleRights(r) != 0
+}
+
+// Enable enables a castle right.
+func (c *CastleRights) Enable(r CastleRight) {
+	*c |= CastleRights(r)
 }
 
 // Disable disables a castle right.
