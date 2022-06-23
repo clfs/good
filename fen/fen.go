@@ -143,6 +143,8 @@ func To(p chess.Position) string {
 	return b.String()
 }
 
+// BUG(clfs): From accepts invalid piece placements without returning an error.
+
 // From returns the position described by the FEN string.
 //
 // These are the only deviations from the PGN standard:
