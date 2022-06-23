@@ -14,10 +14,14 @@ const Starting = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 func init() {
 	colorTo = make(map[chess.Color]string)
+	pieceTo = make(map[chess.Piece]rune)
 	castleRightsTo = make(map[chess.CastleRights]string)
 	enPassantRightTo = make(map[chess.EnPassantRight]string)
 	for k, v := range colorFrom {
 		colorTo[v] = k
+	}
+	for k, v := range pieceFrom {
+		pieceTo[v] = k
 	}
 	for k, v := range castleRightsFrom {
 		castleRightsTo[v] = k
@@ -29,6 +33,7 @@ func init() {
 
 var (
 	colorTo          map[chess.Color]string
+	pieceTo          map[chess.Piece]rune
 	castleRightsTo   map[chess.CastleRights]string
 	enPassantRightTo map[chess.EnPassantRight]string
 )
@@ -36,6 +41,21 @@ var (
 var colorFrom = map[string]chess.Color{
 	"w": chess.White,
 	"b": chess.Black,
+}
+
+var pieceFrom = map[rune]chess.Piece{
+	'P': chess.WhitePawn,
+	'N': chess.WhiteKnight,
+	'B': chess.WhiteBishop,
+	'R': chess.WhiteRook,
+	'Q': chess.WhiteQueen,
+	'K': chess.WhiteKing,
+	'p': chess.BlackPawn,
+	'n': chess.BlackKnight,
+	'b': chess.BlackBishop,
+	'r': chess.BlackRook,
+	'q': chess.BlackQueen,
+	'k': chess.BlackKing,
 }
 
 var castleRightsFrom = map[string]chess.CastleRights{
@@ -79,7 +99,48 @@ var enPassantRightFrom = map[string]chess.EnPassantRight{
 
 // To returns the FEN for a position.
 func To(p chess.Position) string {
-	return ""
+	var b strings.Builder
+
+	// Piece placement.
+	for r := chess.Rank8; r <= chess.Rank8; r-- {
+		skip := 0
+		for f := chess.FileA; f <= chess.FileH; f++ {
+			sq := chess.NewSquare(f, r)
+			piece, ok := p.Get(sq)
+			if !ok {
+				skip++
+				continue
+			}
+			if skip > 0 {
+				fmt.Fprintf(&b, "%d", skip)
+				skip = 0
+			}
+			fmt.Fprintf(&b, "%c", pieceTo[piece]) // lookup is guaranteed ok
+		}
+		if skip > 0 {
+			fmt.Fprintf(&b, "%d", skip)
+		}
+		if r != chess.Rank1 {
+			fmt.Fprintf(&b, "/")
+		}
+	}
+
+	// Active color.
+	fmt.Fprintf(&b, " %s", colorTo[p.SideToMove])
+
+	// Castling rights.
+	fmt.Fprintf(&b, " %s", castleRightsTo[p.Castling])
+
+	// En passant target square.
+	fmt.Fprintf(&b, " %s", enPassantRightTo[p.EnPassant])
+
+	// Half-move clock.
+	fmt.Fprintf(&b, " %d", p.HalfMoves)
+
+	// Full-move count.
+	fmt.Fprintf(&b, " %d", p.FullMoves)
+
+	return b.String()
 }
 
 // From returns the position described by the FEN string.
@@ -107,44 +168,13 @@ func From(s string) (chess.Position, error) {
 			square += chess.Square(r - '0') // advance rightwards
 		case '/':
 			square -= 16 // move to the leftmost square in the rank below
-		case 'P':
-			p.Put(chess.WhitePawn, square)
-			square++
-		case 'N':
-			p.Put(chess.WhiteKnight, square)
-			square++
-		case 'B':
-			p.Put(chess.WhiteBishop, square)
-			square++
-		case 'R':
-			p.Put(chess.WhiteRook, square)
-			square++
-		case 'Q':
-			p.Put(chess.WhiteQueen, square)
-			square++
-		case 'K':
-			p.Put(chess.WhiteKing, square)
-			square++
-		case 'p':
-			p.Put(chess.BlackPawn, square)
-			square++
-		case 'n':
-			p.Put(chess.BlackKnight, square)
-			square++
-		case 'b':
-			p.Put(chess.BlackBishop, square)
-			square++
-		case 'r':
-			p.Put(chess.BlackRook, square)
-			square++
-		case 'q':
-			p.Put(chess.BlackQueen, square)
-			square++
-		case 'k':
-			p.Put(chess.BlackKing, square)
-			square++
 		default:
-			return p, fmt.Errorf("fen: invalid board rune: %c", r)
+			piece, ok := pieceFrom[r]
+			if !ok {
+				return p, fmt.Errorf("fen: invalid board rune: %c", r)
+			}
+			p.Put(piece, square)
+			square++
 		}
 	}
 

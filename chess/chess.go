@@ -203,6 +203,11 @@ const (
 	H8
 )
 
+// NewSquare returns a new Square at the given file and rank.
+func NewSquare(f File, r Rank) Square {
+	return Square(f) | Square(r)<<3
+}
+
 // Valid returns true if the square is valid.
 func (s Square) Valid() bool {
 	return s <= H8
