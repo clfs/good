@@ -106,6 +106,30 @@ func (f File) Valid() bool {
 	return f <= FileH
 }
 
+// Left returns the file to the left of the given file, wrapping around the
+// board.
+func (f File) Left() File {
+	return f.LeftN(1)
+}
+
+// LeftN returns the file n files to the left of the given file, wrapping around
+// the board.
+func (f File) LeftN(n int) File {
+	return (f - File(n)) % 8
+}
+
+// Right returns the file to the right of the given file, wrapping around the
+// board.
+func (f File) Right() File {
+	return f.RightN(1)
+}
+
+// RightN returns the file n files to the right of the given file, wrapping
+// around the board.
+func (f File) RightN(n int) File {
+	return (f + File(n)) % 8
+}
+
 func (f File) String() string {
 	return []string{"FileA", "FileB", "FileC", "FileD", "FileE", "FileF", "FileG", "FileH"}[f]
 }
@@ -126,6 +150,27 @@ const (
 
 func (r Rank) Valid() bool {
 	return r <= Rank8
+}
+
+// Up returns the rank above the given rank, wrapping around the board.
+func (r Rank) Up() Rank {
+	return (r + 1) % 8
+}
+
+// UpN returns the rank n ranks above the given rank, wrapping around the board.
+func (r Rank) UpN(n int) Rank {
+	return (r + Rank(n)) % 8
+}
+
+// Down returns the rank below the given rank, wrapping around the board.
+func (r Rank) Down() Rank {
+	return (r - 1) % 8
+}
+
+// DownN returns the rank n ranks below the given rank, wrapping around the
+// board.
+func (r Rank) DownN(n int) Rank {
+	return (r - Rank(n)) % 8
 }
 
 func (r Rank) String() string {
@@ -228,6 +273,88 @@ func (s Square) Bitboard() Bitboard {
 	return Bitboard(1 << s)
 }
 
+// Up returns the square above the given square, wrapping around the board.
+func (s Square) Up() Square {
+	return NewSquare(s.File(), s.Rank().Up())
+}
+
+// UpN returns the square n squares above the given square, wrapping around the
+// board.
+func (s Square) UpN(n int) Square {
+	ret := s
+	for i := 0; i < n; i++ {
+		ret = ret.Up()
+	}
+	return ret
+}
+
+// Left returns the square to the left of the given square, wrapping around the
+// board.
+func (s Square) Left() Square {
+	return NewSquare(s.File().Left(), s.Rank())
+}
+
+// LeftN returns the square n squares to the left of the given square, wrapping
+// around the board.
+func (s Square) LeftN(n int) Square {
+	ret := s
+	for i := 0; i < n; i++ {
+		ret = ret.Left()
+	}
+	return ret
+}
+
+// Down returns the square below the given square, wrapping around the board.
+func (s Square) Down() Square {
+	return NewSquare(s.File(), s.Rank().Down())
+}
+
+// DownN returns the square n squares below the given square, wrapping around
+// the board.
+func (s Square) DownN(n int) Square {
+	ret := s
+	for i := 0; i < n; i++ {
+		ret = ret.Down()
+	}
+	return ret
+}
+
+// Right returns the square to the right of the given square, wrapping around
+// the board.
+func (s Square) Right() Square {
+	return NewSquare(s.File().Right(), s.Rank())
+}
+
+// RightN returns the square n squares to the right of the given square,
+// wrapping around the board.
+func (s Square) RightN(n int) Square {
+	ret := s
+	for i := 0; i < n; i++ {
+		ret = ret.Right()
+	}
+	return ret
+}
+
+// IsTopEdge returns true if the square is on the top edge of the board.
+func (s Square) IsTopEdge() bool {
+	return s.Rank() == Rank8
+}
+
+// IsLeftEdge returns true if the square is on the left edge of the board.
+func (s Square) IsLeftEdge() bool {
+	return s.File() == FileA
+}
+
+// IsBottomEdge returns true if the square is on the bottom edge of the board.
+func (s Square) IsBottomEdge() bool {
+	return s.Rank() == Rank1
+}
+
+// IsRightEdge returns true if the square is on the right edge of the board.
+func (s Square) IsRightEdge() bool {
+	return s.File() == FileH
+}
+
 func (s Square) String() string {
 	return []string{
 		"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
@@ -288,8 +415,8 @@ type Move uint16
 //
 // To represent promotion moves, use NewPromotionMove instead.
 //
-// To represent castling moves, use the king and rook's current squares as the
-// from and to squares respectively.
+// To represent castling moves, use the king's original and destination squares
+// as the from and to squares respectively.
 func NewMove(from, to Square) Move {
 	return Move(from) | Move(to)<<6
 }
@@ -299,20 +426,16 @@ func NewPromotionMove(from, to Square, p Piece) Move {
 	return Move(from) | Move(to)<<6 | Move(p)<<12
 }
 
-// From returns the square at which the move starts, except when the move is
-// a castling move.
+// From returns the square at which the move starts.
 //
-// If the move is a castling move, the from square will be the king's current
-// position instead.
+// If the move is castling, the from square is the king's original square.
 func (m Move) From() Square {
 	return Square(m & 0x3F)
 }
 
-// To returns the square at which the move ends, except when the move is a
-// castling move.
+// To returns the square at which the move ends.
 //
-// If the move is a castling move, the to square will be the rook's current
-// position instead.
+// If the move is castling, the to square is the king's destination square.
 func (m Move) To() Square {
 	return Square((m >> 6) & 0x3F)
 }
