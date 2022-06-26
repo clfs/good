@@ -1,4 +1,4 @@
-package movegen
+package fastgen
 
 import "github.com/clfs/good/chess"
 
