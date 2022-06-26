@@ -3,23 +3,23 @@ package chess
 // Position represents a game position.
 // Three-fold repetition is not tracked here.
 type Position struct {
-	Board      []Bitboard // Board describes which pieces are on the board and where.
-	Castling   CastleRights
-	EnPassant  EnPassantRight
-	SideToMove Color
-	HalfMoves  uint8  // HalfMoves is the number of half moves since the last capture or pawn move.
-	FullMoves  uint16 // FullMoves starts at 1 and is incremented after Black moves.
+	Board          []Bitboard // Board describes which pieces are on the board and where.
+	CastleRights   CastleRights
+	EnPassantRight EnPassantRight
+	SideToMove     Color
+	HalfMoves      uint8  // HalfMoves is the number of half moves since the last capture or pawn move.
+	FullMoves      uint16 // FullMoves starts at 1 and is incremented after Black moves.
 }
 
 // NewPosition returns a new position, pre-populated with all starting pieces.
 func NewPosition() Position {
 	p := Position{
-		Board:      make([]Bitboard, 12),
-		Castling:   AllCastleRights,
-		EnPassant:  NoEnPassantRight,
-		SideToMove: White,
-		HalfMoves:  0,
-		FullMoves:  1,
+		Board:          make([]Bitboard, 12),
+		CastleRights:   AllCastleRights,
+		EnPassantRight: NoEnPassantRight,
+		SideToMove:     White,
+		HalfMoves:      0,
+		FullMoves:      1,
 	}
 	p.Put(WhiteRook, A1)
 	p.Put(WhiteKnight, B1)
