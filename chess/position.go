@@ -3,7 +3,7 @@ package chess
 // Position represents a game position.
 // Three-fold repetition is not tracked here.
 type Position struct {
-	Board      [12]Bitboard // Board describes which pieces are on the board and where.
+	Board      []Bitboard // Board describes which pieces are on the board and where.
 	Castling   CastleRights
 	EnPassant  EnPassantRight
 	SideToMove Color
@@ -14,7 +14,7 @@ type Position struct {
 // NewPosition returns a new position, pre-populated with all starting pieces.
 func NewPosition() Position {
 	p := Position{
-		Board:      [12]Bitboard{},
+		Board:      make([]Bitboard, 12),
 		Castling:   AllCastleRights,
 		EnPassant:  NoEnPassantRight,
 		SideToMove: White,
@@ -64,10 +64,6 @@ func (p *Position) Get(s Square) (pc Piece, ok bool) {
 
 // Reset resets the position to the starting position.
 func (p *Position) Reset() {
-	p.Board = [12]Bitboard{}
-	p.Castling = AllCastleRights
-	p.EnPassant = NoEnPassantRight
-	p.SideToMove = White
-	p.HalfMoves = 0
-	p.FullMoves = 1
+	// TODO: Optimize this to eliminate all allocations.
+	*p = NewPosition()
 }
