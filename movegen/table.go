@@ -20,33 +20,28 @@ func init() {
 
 	// [DONE] White pawns moving one square up without promoting.
 	for s := chess.A2; s <= chess.H6; s++ {
-		move := chess.NewMove(s, s.Up())
-		Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], move)
+		Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], chess.NewMove(s, s.Up()))
 	}
 
 	// [DONE] White pawns moving two squares up.
 	for s := chess.A2; s <= chess.H2; s++ {
-		move := chess.NewMove(s, s.UpN(2))
-		Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], move)
+		Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], chess.NewMove(s, s.UpN(2)))
 	}
 
 	// [DONE] White pawns capturing without promoting.
 	for s := chess.A2; s <= chess.H6; s++ {
 		if !s.IsLeftEdge() {
-			move := chess.NewMove(s, s.Up().Left())
-			Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], move)
+			Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], chess.NewMove(s, s.Up().Left()))
 		}
 		if !s.IsRightEdge() {
-			move := chess.NewMove(s, s.Up().Right())
-			Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], move)
+			Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], chess.NewMove(s, s.Up().Right()))
 		}
 	}
 
 	// [DONE] White pawns promoting without capturing.
 	for s := chess.A7; s <= chess.H7; s++ {
 		for pc := chess.WhiteKnight; pc <= chess.WhiteQueen; pc++ {
-			move := chess.NewPromotionMove(s, s.Up(), pc)
-			Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], move)
+			Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], chess.NewPromotionMove(s, s.Up(), pc))
 		}
 	}
 
@@ -54,26 +49,22 @@ func init() {
 	for s := chess.A7; s <= chess.H7; s++ {
 		for pc := chess.WhiteKnight; pc <= chess.WhiteQueen; pc++ {
 			if !s.IsLeftEdge() {
-				move := chess.NewPromotionMove(s, s.Up().Left(), pc)
-				Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], move)
+				Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], chess.NewPromotionMove(s, s.Up().Left(), pc))
 			}
 			if !s.IsRightEdge() {
-				move := chess.NewPromotionMove(s, s.Up().Right(), pc)
-				Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], move)
+				Table[chess.WhitePawn][s] = append(Table[chess.WhitePawn][s], chess.NewPromotionMove(s, s.Up().Right(), pc))
 			}
 		}
 	}
 
 	// [DONE] Black pawns moving one square down without promoting.
 	for s := chess.A3; s <= chess.H7; s++ {
-		move := chess.NewMove(s, s.Down())
-		Table[chess.BlackPawn][s] = append(Table[chess.BlackPawn][s], move)
+		Table[chess.BlackPawn][s] = append(Table[chess.BlackPawn][s], chess.NewMove(s, s.Down()))
 	}
 
 	// [DONE] Black pawns moving two squares down.
 	for s := chess.A7; s <= chess.H7; s++ {
-		move := chess.NewMove(s, s.DownN(2))
-		Table[chess.BlackPawn][s] = append(Table[chess.BlackPawn][s], move)
+		Table[chess.BlackPawn][s] = append(Table[chess.BlackPawn][s], chess.NewMove(s, s.DownN(2)))
 	}
 
 	// Black pawns capturing without promoting.
