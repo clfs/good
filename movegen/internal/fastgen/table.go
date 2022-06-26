@@ -1,3 +1,4 @@
+// Package fastgen is a fast implementation of a move generator.
 package fastgen
 
 import "github.com/clfs/good/chess"
