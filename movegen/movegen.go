@@ -1,3 +1,4 @@
+// Package movegen is a move generator.
 package movegen
 
 import (
