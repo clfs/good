@@ -32,8 +32,8 @@ func (b *Bitboard) IsEmpty() bool {
 }
 
 // Intersects returns true if two bitboards have any bits in common.
-func (b *Bitboard) Intersects(other *Bitboard) bool {
-	return *b&*other != 0
+func (b *Bitboard) Intersects(other Bitboard) bool {
+	return *b&other != 0
 }
 
 // SetIf sets the bit at a square to 1 if cond is true.
