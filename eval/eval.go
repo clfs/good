@@ -1,3 +1,4 @@
+// Package eval implmements an evaluation function for positions.
 package eval
 
 import (
