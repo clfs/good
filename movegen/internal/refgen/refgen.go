@@ -1,3 +1,4 @@
+// Package refgen is a slow reference implementation of a move generator.
 package refgen
 
 import "github.com/clfs/good/chess"
