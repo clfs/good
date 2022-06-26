@@ -1,4 +1,5 @@
-// Package refeval implements a reference evaluation function.
+// Package refeval implements an evaluation function that only accounts for
+// material and checkmate.
 package refeval
 
 import (
@@ -21,6 +22,7 @@ var PieceValues = map[chess.Piece]int{
 
 // Position returns the value of a position.
 func Position(p chess.Position) int {
+	// TODO: Account for checkmate.
 	var score int
 	for s := chess.A1; s <= chess.H8; s++ {
 		pc, ok := p.Get(s)
