@@ -7,8 +7,11 @@ import (
 )
 
 func main() {
-	for _, v := range chess.TableQueenAttacks {
-		fmt.Printf("%#016X\n", v)
+	for i, v := range chess.TableBlackPawnPushes {
+		if i%4 == 0 {
+			fmt.Printf("\n")
+		}
+		fmt.Printf("%#016X, ", v)
 	}
 
 	// client := uci.New(os.Stdin, os.Stdout)
