@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	for _, v := range chess.TableKingAttacks {
+	for _, v := range chess.TableQueenAttacks {
 		fmt.Printf("%#016X\n", v)
 	}
 
