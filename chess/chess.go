@@ -106,28 +106,24 @@ func (f File) Valid() bool {
 	return f <= FileH
 }
 
-// Left returns the file to the left of the given file, wrapping around the
-// board.
+// Left returns the file to the left. For FileA, the result is invalid.
 func (f File) Left() File {
-	return f.LeftN(1)
+	return f - 1
 }
 
-// LeftN returns the file n files to the left of the given file, wrapping around
-// the board.
+// LeftN returns the file n files to the left. The result may be invalid.
 func (f File) LeftN(n int) File {
-	return (f - File(n)) % 8
+	return f - File(n)
 }
 
-// Right returns the file to the right of the given file, wrapping around the
-// board.
+// Right returns the file to the right. For FileH, the result is invalid.
 func (f File) Right() File {
-	return f.RightN(1)
+	return f + 1
 }
 
-// RightN returns the file n files to the right of the given file, wrapping
-// around the board.
+// RightN returns the file n files to the right. The result may be invalid.
 func (f File) RightN(n int) File {
-	return (f + File(n)) % 8
+	return f + File(n)
 }
 
 func (f File) String() string {
@@ -152,25 +148,24 @@ func (r Rank) Valid() bool {
 	return r <= Rank8
 }
 
-// Up returns the rank above the given rank, wrapping around the board.
-func (r Rank) Up() Rank {
-	return (r + 1) % 8
+// Above returns the rank above. For Rank8, the result is invalid.
+func (r Rank) Above() Rank {
+	return r + 1
 }
 
-// UpN returns the rank n ranks above the given rank, wrapping around the board.
-func (r Rank) UpN(n int) Rank {
-	return (r + Rank(n)) % 8
+// AboveN returns the rank n ranks above. The result may be invalid.
+func (r Rank) AboveN(n int) Rank {
+	return r + Rank(n)
 }
 
-// Down returns the rank below the given rank, wrapping around the board.
-func (r Rank) Down() Rank {
-	return (r - 1) % 8
+// Below returns the rank below. For Rank1, the result is invalid.
+func (r Rank) Below() Rank {
+	return r - 1
 }
 
-// DownN returns the rank n ranks below the given rank, wrapping around the
-// board.
-func (r Rank) DownN(n int) Rank {
-	return (r - Rank(n)) % 8
+// BelowN returns the rank n ranks below. The result may be invalid.
+func (r Rank) BelowN(n int) Rank {
+	return r - Rank(n)
 }
 
 func (r Rank) String() string {
@@ -253,6 +248,11 @@ func NewSquare(f File, r Rank) Square {
 	return Square(f) | Square(r)<<3
 }
 
+// IsValidCoords returns true if the given coordinates reference a valid square.
+func IsValidCoords(f File, r Rank) bool {
+	return f.Valid() && r.Valid()
+}
+
 // Valid returns true if the square is valid.
 func (s Square) Valid() bool {
 	return s <= H8
@@ -271,88 +271,6 @@ func (s Square) Rank() Rank {
 // Bitboard returns the bitboard representation of the square.
 func (s Square) Bitboard() Bitboard {
 	return Bitboard(1 << s)
-}
-
-// Up returns the square above the given square, wrapping around the board.
-func (s Square) Up() Square {
-	return NewSquare(s.File(), s.Rank().Up())
-}
-
-// UpN returns the square n squares above the given square, wrapping around the
-// board.
-func (s Square) UpN(n int) Square {
-	ret := s
-	for i := 0; i < n; i++ {
-		ret = ret.Up()
-	}
-	return ret
-}
-
-// Left returns the square to the left of the given square, wrapping around the
-// board.
-func (s Square) Left() Square {
-	return NewSquare(s.File().Left(), s.Rank())
-}
-
-// LeftN returns the square n squares to the left of the given square, wrapping
-// around the board.
-func (s Square) LeftN(n int) Square {
-	ret := s
-	for i := 0; i < n; i++ {
-		ret = ret.Left()
-	}
-	return ret
-}
-
-// Down returns the square below the given square, wrapping around the board.
-func (s Square) Down() Square {
-	return NewSquare(s.File(), s.Rank().Down())
-}
-
-// DownN returns the square n squares below the given square, wrapping around
-// the board.
-func (s Square) DownN(n int) Square {
-	ret := s
-	for i := 0; i < n; i++ {
-		ret = ret.Down()
-	}
-	return ret
-}
-
-// Right returns the square to the right of the given square, wrapping around
-// the board.
-func (s Square) Right() Square {
-	return NewSquare(s.File().Right(), s.Rank())
-}
-
-// RightN returns the square n squares to the right of the given square,
-// wrapping around the board.
-func (s Square) RightN(n int) Square {
-	ret := s
-	for i := 0; i < n; i++ {
-		ret = ret.Right()
-	}
-	return ret
-}
-
-// IsTopEdge returns true if the square is on the top edge of the board.
-func (s Square) IsTopEdge() bool {
-	return s.Rank() == Rank8
-}
-
-// IsLeftEdge returns true if the square is on the left edge of the board.
-func (s Square) IsLeftEdge() bool {
-	return s.File() == FileA
-}
-
-// IsBottomEdge returns true if the square is on the bottom edge of the board.
-func (s Square) IsBottomEdge() bool {
-	return s.Rank() == Rank1
-}
-
-// IsRightEdge returns true if the square is on the right edge of the board.
-func (s Square) IsRightEdge() bool {
-	return s.File() == FileH
 }
 
 func (s Square) String() string {

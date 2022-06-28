@@ -67,3 +67,75 @@ func (p *Position) Reset() {
 	// TODO: Optimize this to eliminate all allocations.
 	*p = NewPosition()
 }
+
+// AllPieces returns a bitboard of all piece locations.
+func (p *Position) AllPieces() Bitboard {
+	var b Bitboard
+	for _, bb := range p.Board {
+		b |= bb
+	}
+	return b
+}
+
+// WhitePieces returns a bitboard of all white piece locations.
+func (p *Position) WhitePieces() Bitboard {
+	var b Bitboard
+	for pc := WhitePawn; pc <= WhiteKing; pc++ {
+		b |= p.Board[pc]
+	}
+	return b
+}
+
+// BlackPieces returns a bitboard of all black piece locations.
+func (p *Position) BlackPieces() Bitboard {
+	var b Bitboard
+	for pc := BlackPawn; pc <= BlackKing; pc++ {
+		b |= p.Board[pc]
+	}
+	return b
+}
+
+/*
+// LegalMoves returns all legal moves in the position.
+func (p *Position) LegalMoves() []Move {
+	var (
+		result      []Move
+		friends     []Bitboard // Bitboards for all friendly pieces.
+		enemies     []Bitboard // Bitboards for all enemy pieces.
+		shortCastle bool       // Whether or not the side to move can castle short.
+		longCastle  bool       // Whether or not the side to move can castle long.
+	)
+
+	if p.SideToMove == White {
+		friends = p.Board[WhitePawn : WhiteKing+1]
+		enemies = p.Board[BlackPawn : BlackKing+1]
+		shortCastle = p.CastleRights.Get(WhiteShortCastleRight)
+		longCastle = p.CastleRights.Get(WhiteLongCastleRight)
+	} else {
+		friends = p.Board[BlackPawn : BlackKing+1]
+		enemies = p.Board[WhitePawn : WhiteKing+1]
+		shortCastle = p.CastleRights.Get(BlackShortCastleRight)
+		longCastle = p.CastleRights.Get(BlackLongCastleRight)
+	}
+
+	var friendOccupancy Bitboard // Bitboard of all friendly pieces' locations.
+	for _, bb := range friends {
+		friendOccupancy |= bb
+	}
+
+	for s := A1; s <= H8; s++ {
+		// Skip if there's no piece on the square.
+		if !friendOccupancy.Get(s) {
+			continue
+		}
+
+		// If it's a king...
+		if friends[King].Get(s) {
+			// ... add legal non-castling moves.
+			continue
+		}
+	}
+
+	return result
+}
+*/

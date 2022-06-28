@@ -1,15 +1,18 @@
 package main
 
 import (
-	"log"
-	"os"
+	"fmt"
 
-	"github.com/clfs/good/uci"
+	"github.com/clfs/good/chess"
 )
 
 func main() {
-	client := uci.New(os.Stdin, os.Stdout)
-	if err := client.Run(); err != nil {
-		log.Fatal(err)
+	for _, v := range chess.TableKingAttacks {
+		fmt.Printf("%#016X\n", v)
 	}
+
+	// client := uci.New(os.Stdin, os.Stdout)
+	// if err := client.Run(); err != nil {
+	// 	log.Fatal(err)
+	// }
 }
