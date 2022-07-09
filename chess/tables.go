@@ -1,10 +1,16 @@
 package chess
 
-// TargetTable is a lookup table for squares a piece can target. For example,
-// TargetTable[WhitePawn][A2] returns a bitboard with A3, B3, and A4 set.
-var TargetTable [][]Bitboard
+// targetTable is a lookup table for squares a piece can target. For example,
+// targetTable[WhitePawn][A2] returns a bitboard with A3, B3, and A4 set.
+var targetTable [][]Bitboard
+
+// magicTable is a lookup table for squares that sliding pieces (bishops, rooks,
+// and queens) can target, while also respecting occupied squares.
+var magicTable []Bitboard
 
 type magicParameters struct {
+	index uint64 // index into magicTable
+	mask  uint64
 	scale uint64
 	shift uint8
 }
@@ -15,13 +21,21 @@ var rookMagicParameters []magicParameters
 // bishopMagicParameters holds parameters for indexing into bishopMagicTable.
 var bishopMagicParameters []magicParameters
 
-// rookMagicTable is a lookup table for rook moves that also respects occupied
-// squares.
-var rookMagicTable []Bitboard
+func BishopAttacks(s Square, occupied Bitboard) Bitboard {
+	p := bishopMagicParameters[s]
+	offset := uint64(occupied) & p.mask * p.scale >> p.shift
+	return magicTable[p.index+offset]
+}
 
-// bishopMagicTable is a lookup table for bishop moves that also respects
-// occupied squares.
-var bishopMagicTable []Bitboard
+func RookAttacks(s Square, occupied Bitboard) Bitboard {
+	p := rookMagicParameters[s]
+	offset := uint64(occupied) & p.mask * p.scale >> p.shift
+	return magicTable[p.index+offset]
+}
+
+func QueenAttacks(s Square, occupied Bitboard) Bitboard {
+	return BishopAttacks(s, occupied) | RookAttacks(s, occupied)
+}
 
 func init() {
 	// Movement constants for target square generation.
@@ -32,10 +46,10 @@ func init() {
 		kingDeltas   = [][]int{{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}}
 	)
 
-	TargetTable = make([][]Bitboard, 12)
-	bitboards := make([]Bitboard, 12*64) // backing slice for TargetTable
-	for i := range TargetTable {
-		TargetTable[i], bitboards = bitboards[:64], bitboards[64:]
+	targetTable = make([][]Bitboard, 12)
+	bitboards := make([]Bitboard, 12*64) // Backing slice for targetTable
+	for i := range targetTable {
+		targetTable[i], bitboards = bitboards[:64], bitboards[64:]
 	}
 
 	// Targets for white pieces.
@@ -44,15 +58,15 @@ func init() {
 
 		// White pawn targets.
 		if r != Rank1 && r != Rank8 {
-			TargetTable[WhitePawn][s].Set(NewSquare(f, r+1)) // single push
+			targetTable[WhitePawn][s].Set(NewSquare(f, r+1)) // single push
 			if r == Rank2 {
-				TargetTable[WhitePawn][s].Set(NewSquare(f, r+2)) // double push
+				targetTable[WhitePawn][s].Set(NewSquare(f, r+2)) // double push
 			}
 			if f != FileA {
-				TargetTable[WhitePawn][s].Set(NewSquare(f-1, r+1)) // left-up
+				targetTable[WhitePawn][s].Set(NewSquare(f-1, r+1)) // left-up
 			}
 			if f != FileH {
-				TargetTable[WhitePawn][s].Set(NewSquare(f+1, r+1)) // right-up
+				targetTable[WhitePawn][s].Set(NewSquare(f+1, r+1)) // right-up
 			}
 		}
 
@@ -61,7 +75,7 @@ func init() {
 			f := f + File(d[0])
 			r := r + Rank(d[1])
 			if f.Valid() && r.Valid() {
-				TargetTable[WhiteKnight][s].Set(NewSquare(f, r))
+				targetTable[WhiteKnight][s].Set(NewSquare(f, r))
 			}
 		}
 
@@ -70,7 +84,7 @@ func init() {
 			f := f + File(d[0])
 			r := r + Rank(d[1])
 			for f.Valid() && r.Valid() {
-				TargetTable[WhiteBishop][s].Set(NewSquare(f, r))
+				targetTable[WhiteBishop][s].Set(NewSquare(f, r))
 				f = f + File(d[0])
 				r = r + Rank(d[1])
 			}
@@ -81,33 +95,33 @@ func init() {
 			f := f + File(d[0])
 			r := r + Rank(d[1])
 			for f.Valid() && r.Valid() {
-				TargetTable[WhiteRook][s].Set(NewSquare(f, r))
+				targetTable[WhiteRook][s].Set(NewSquare(f, r))
 				f += File(d[0])
 				r += Rank(d[1])
 			}
 		}
 
 		// White queen targets.
-		TargetTable[WhiteQueen][s] = TargetTable[WhiteBishop][s] | TargetTable[WhiteRook][s]
+		targetTable[WhiteQueen][s] = targetTable[WhiteBishop][s] | targetTable[WhiteRook][s]
 
 		// White king targets.
 		for _, d := range kingDeltas {
 			f := f + File(d[0])
 			r := r + Rank(d[1])
 			if f.Valid() && r.Valid() {
-				TargetTable[WhiteKing][s].Set(NewSquare(f, r))
+				targetTable[WhiteKing][s].Set(NewSquare(f, r))
 			}
 		}
 	}
 
 	// Targets for black pieces.
-	copy(TargetTable[BlackPawn], TargetTable[WhitePawn])
+	copy(targetTable[BlackPawn], targetTable[WhitePawn])
 	for s := A1; s < H8; s++ {
-		TargetTable[BlackPawn][s].Mirror()
+		targetTable[BlackPawn][s].Mirror()
 	}
-	copy(TargetTable[BlackKnight], TargetTable[WhiteKnight])
-	copy(TargetTable[BlackBishop], TargetTable[WhiteBishop])
-	copy(TargetTable[BlackRook], TargetTable[WhiteRook])
-	copy(TargetTable[BlackQueen], TargetTable[WhiteQueen])
-	copy(TargetTable[BlackKing], TargetTable[WhiteKing])
+	copy(targetTable[BlackKnight], targetTable[WhiteKnight])
+	copy(targetTable[BlackBishop], targetTable[WhiteBishop])
+	copy(targetTable[BlackRook], targetTable[WhiteRook])
+	copy(targetTable[BlackQueen], targetTable[WhiteQueen])
+	copy(targetTable[BlackKing], targetTable[WhiteKing])
 }
