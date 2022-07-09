@@ -129,10 +129,10 @@ func To(p chess.Position) string {
 	fmt.Fprintf(&b, " %s", colorTo[p.SideToMove])
 
 	// Castling rights.
-	fmt.Fprintf(&b, " %s", castleRightsTo[p.Castling])
+	fmt.Fprintf(&b, " %s", castleRightsTo[p.CastleRights])
 
 	// En passant target square.
-	fmt.Fprintf(&b, " %s", enPassantRightTo[p.EnPassant])
+	fmt.Fprintf(&b, " %s", enPassantRightTo[p.EnPassantRight])
 
 	// Half-move clock.
 	fmt.Fprintf(&b, " %d", p.HalfMoves)
@@ -192,14 +192,14 @@ func From(s string) (chess.Position, error) {
 	if !ok {
 		return p, fmt.Errorf("fen: invalid castle rights: %s", fields[2])
 	}
-	p.Castling = castleRights
+	p.CastleRights = castleRights
 
 	// En passant square.
 	enPassantRight, ok := enPassantRightFrom[fields[3]]
 	if !ok {
 		return p, fmt.Errorf("fen: invalid en passant square: %s", fields[3])
 	}
-	p.EnPassant = enPassantRight
+	p.EnPassantRight = enPassantRight
 
 	// Half-move clock.
 	halfMoves, err := strconv.ParseUint(fields[4], 10, 8)

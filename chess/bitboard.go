@@ -1,27 +1,55 @@
 package chess
 
-import "strings"
+import (
+	"math/bits"
+	"strings"
+)
 
 // Bitboard is an integer where each bit represents one square.
 // From LSB to MSB, the bits represent a1, b1, ..., h1, a2, ..., h8.
 type Bitboard uint64
 
-// Set sets the bit at a square to 1.
+// Set sets the bit at s to 1.
 func (b *Bitboard) Set(s Square) {
 	*b |= s.Bitboard()
 }
 
-// Clear clears the bit at a square to 0.
+// SetIf sets the bit at s to 1 if cond is true.
+// If cond is false, the bit is left unchanged.
+func (b *Bitboard) SetIf(s Square, cond bool) {
+	if cond {
+		b.Set(s)
+	}
+}
+
+// Clear clears the bit at s to 0.
 func (b *Bitboard) Clear(s Square) {
 	*b &^= s.Bitboard()
 }
 
-// Get returns true if the bit at a square is 1.
+// ClearIf clears the bit at s to 0 if cond is true.
+// If cond is false, the bit is left unchanged.
+func (b *Bitboard) ClearIf(s Square, cond bool) {
+	if cond {
+		b.Clear(s)
+	}
+}
+
+// Assign sets the bit at s to 1 if cond is true or 0 if cond is false.
+func (b *Bitboard) Assign(s Square, cond bool) {
+	if cond {
+		*b = 1
+	} else {
+		*b = 0
+	}
+}
+
+// Get returns true if the bit at s is 1.
 func (b *Bitboard) Get(s Square) bool {
 	return *b&s.Bitboard()>>s != 0
 }
 
-// Toggle toggles the bit at a square.
+// Toggle toggles the bit at s.
 func (b *Bitboard) Toggle(s Square) {
 	*b ^= s.Bitboard()
 }
@@ -36,13 +64,10 @@ func (b *Bitboard) Intersects(other Bitboard) bool {
 	return *b&other != 0
 }
 
-// SetIf sets the bit at a square to 1 if cond is true.
-func (b *Bitboard) SetIf(s Square, cond bool) {
-	if cond {
-		b.Set(s)
-	} else {
-		b.Clear(s)
-	}
+// Mirror mirrors the represented board vertically.
+// For example, the bit at A1 is now at A8.
+func (b *Bitboard) Mirror() {
+	*b = Bitboard(bits.ReverseBytes64(uint64(*b)))
 }
 
 // DebugString returns a multi-line string representation of the bitboard.

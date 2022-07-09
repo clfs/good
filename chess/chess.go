@@ -111,19 +111,9 @@ func (f File) Left() File {
 	return f - 1
 }
 
-// LeftN returns the file n files to the left. The result may be invalid.
-func (f File) LeftN(n int) File {
-	return f - File(n)
-}
-
 // Right returns the file to the right. For FileH, the result is invalid.
 func (f File) Right() File {
 	return f + 1
-}
-
-// RightN returns the file n files to the right. The result may be invalid.
-func (f File) RightN(n int) File {
-	return f + File(n)
 }
 
 func (f File) String() string {
@@ -153,19 +143,9 @@ func (r Rank) Above() Rank {
 	return r + 1
 }
 
-// AboveN returns the rank n ranks above. The result may be invalid.
-func (r Rank) AboveN(n int) Rank {
-	return r + Rank(n)
-}
-
 // Below returns the rank below. For Rank1, the result is invalid.
 func (r Rank) Below() Rank {
 	return r - 1
-}
-
-// BelowN returns the rank n ranks below. The result may be invalid.
-func (r Rank) BelowN(n int) Rank {
-	return r - Rank(n)
 }
 
 func (r Rank) String() string {
