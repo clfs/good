@@ -4,6 +4,12 @@ package chess
 // targetTable[WhitePawn][A2] returns a bitboard with A3, B3, and A4 set.
 var targetTable [][]Bitboard
 
+// Targets returns the squares a piece can target from a given square. For
+// example, Targets(WhitePawn, A2) returns a bitboard with A3, B3, and A4 set.
+func Targets(p Piece, s Square) Bitboard {
+	return targetTable[p][s]
+}
+
 // magicTable is a lookup table for squares that sliding pieces (bishops, rooks,
 // and queens) can target, while also respecting occupied squares.
 var magicTable []Bitboard
@@ -21,18 +27,24 @@ var rookMagicParameters []magicParameters
 // bishopMagicParameters holds parameters for indexing into bishopMagicTable.
 var bishopMagicParameters []magicParameters
 
+// BishopAttacks returns the squares a bishop can attack from a given square,
+// accounting for occupied squares.
 func BishopAttacks(s Square, occupied Bitboard) Bitboard {
 	p := bishopMagicParameters[s]
 	offset := uint64(occupied) & p.mask * p.scale >> p.shift
 	return magicTable[p.index+offset]
 }
 
+// RookAttacks returns the squares a rook can attack from a given square,
+// accounting for occupied squares.
 func RookAttacks(s Square, occupied Bitboard) Bitboard {
 	p := rookMagicParameters[s]
 	offset := uint64(occupied) & p.mask * p.scale >> p.shift
 	return magicTable[p.index+offset]
 }
 
+// QueenAttacks returns the squares a queen can attack from a given square,
+// accounting for occupied squares.
 func QueenAttacks(s Square, occupied Bitboard) Bitboard {
 	return BishopAttacks(s, occupied) | RookAttacks(s, occupied)
 }
